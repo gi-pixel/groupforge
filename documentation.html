@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>GroupForge | Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --indigo-50: #eef2ff;
+            --indigo-100: #e0e7ff;
+            --indigo-200: #c7d2fe;
+            --indigo-300: #a5b4fc;
+            --indigo-400: #818cf8;
+            --indigo-500: #6366f1;
+            --indigo-600: #4f46e5;
+            --indigo-700: #4338ca;
+            --indigo-800: #3730a3;
+            --indigo-900: #312e81;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --radius-sm: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            color: var(--gray-800);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Navigation - Matching Main Project */
+        .navbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            color: var(--indigo-600);
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .logo-highlight {
+            color: var(--indigo-600);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--indigo-600);
+        }
+
+        /* Mobile Menu */
+        .hamburger {
+            display: none;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            padding: 0.5rem;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .hamburger span {
+            width: 22px;
+            height: 2px;
+            background: var(--gray-700);
+            transition: all 0.3s;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 80%;
+            max-width: 320px;
+            height: 100%;
+            background: var(--white);
+            box-shadow: var(--shadow-xl);
+            z-index: 200;
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .mobile-menu.open {
+            left: 0;
+        }
+
+        .mobile-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--indigo-50);
+        }
+
+        .close-menu {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-menu-links {
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .mobile-nav-link {
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: var(--gray-700);
+            border-radius: var(--radius-md);
+            font-weight: 500;
+        }
+
+        .mobile-nav-link.active {
+            background: var(--indigo-50);
+            color: var(--indigo-700);
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 150;
+            display: none;
+        }
+
+        .menu-overlay.active {
+            display: block;
+        }
+
+        /* Layout */
+        .layout {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        /* Sidebar with Dropdowns */
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+
+        .nav-group {
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .nav-title {
+            width: 100%;
+            background: var(--white);
+            border: none;
+            padding: 0.85rem 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-align: left;
+            color: var(--gray-800);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .nav-title:hover {
+            background: var(--gray-50);
+        }
+
+        .nav-title .arrow {
+            transition: transform 0.2s;
+            color: var(--gray-400);
+        }
+
+        .nav-group.open .nav-title .arrow {
+            transform: rotate(180deg);
+        }
+
+        .nav-group.open .nav-title {
+            background: var(--indigo-50);
+            border-bottom: 1px solid var(--indigo-200);
+        }
+
+        .nav-links {
+            display: none;
+            flex-direction: column;
+            padding: 0.5rem;
+            background: var(--white);
+        }
+
+        .nav-group.open .nav-links {
+            display: flex;
+        }
+
+        .nav-links a {
+            color: var(--gray-600);
+            text-decoration: none;
+            padding: 0.6rem 0.85rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .nav-links a:hover {
+            background: var(--gray-50);
+            color: var(--indigo-600);
+        }
+
+        .nav-links .active {
+            background: var(--indigo-50);
+            color: var(--indigo-700);
+        }
+
+        /* Main Content */
+        .content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .docs {
+            max-width: 800px;
+        }
+
+        .docs h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+        }
+
+        .lead {
+            font-size: 1.1rem;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .docs section {
+            margin-bottom: 2.5rem;
+            scroll-margin-top: 80px;
+        }
+
+        .docs h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+            border-left: 3px solid var(--indigo-500);
+            padding-left: 0.75rem;
+        }
+
+        .docs h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 1.25rem 0 0.5rem;
+            color: var(--gray-700);
+        }
+
+        .docs p {
+            color: var(--gray-600);
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+
+        .docs ul, .docs ol {
+            margin: 0.75rem 0;
+            padding-left: 1.5rem;
+            color: var(--gray-600);
+        }
+
+        .docs li {
+            margin-bottom: 0.4rem;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--gray-900);
+            color: #86efac;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        /* Notice Box */
+        .notice {
+            background: var(--indigo-50);
+            border-left: 3px solid var(--indigo-500);
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 2rem;
+            color: var(--gray-700);
+        }
+
+        .tip-box {
+            background: var(--gray-50);
+            border-left: 3px solid #10b981;
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            margin: 1rem 0;
+        }
+
+        .warning-box {
+            background: #fffbeb;
+            border-left: 3px solid #f59e0b;
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            margin: 1rem 0;
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            transition: all 0.2s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--indigo-300);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .feature-card strong {
+            color: var(--indigo-700);
+        }
+
+        /* Table */
+        .feature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .feature-table th,
+        .feature-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .feature-table th {
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--gray-200);
+            color: var(--gray-400);
+            font-size: 0.75rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .layout {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                width: 100%;
+                position: static;
+                margin-bottom: 1.5rem;
+            }
+
+            .docs h1 {
+                font-size: 1.75rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-menu, .menu-overlay {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation - Same as Main Project -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <button class="hamburger" id="hamburgerBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="index.html" class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="logo-text">Group<span class="logo-highlight">Forge</span></span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Workspace</a>
+                <a href="documentation.html" class="nav-link active">Documentation</a>
+                <a href="#" class="nav-link">Support</a>
+            </div>
+        </div>
+
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-header">
+                <div class="mobile-logo">GroupForge</div>
+                <button class="close-menu" id="closeMenuBtn">&times;</button>
+            </div>
+            <div class="mobile-menu-links">
+                <a href="index.html" class="mobile-nav-link">Workspace</a>
+                <a href="documentation.html" class="mobile-nav-link active">Documentation</a>
+                <a href="#" class="mobile-nav-link">Support</a>
+            </div>
+        </div>
+        <div class="menu-overlay" id="menuOverlay"></div>
+    </nav>
+
+    <div class="layout">
+        <!-- Sidebar with Dropdowns -->
+        <aside class="sidebar">
+            <div class="nav-group" id="group-getting-started">
+                <button class="nav-title">
+                    Documentation
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="nav-links">
+                    <a href="#overview">Overview</a>
+                    <a href="#getting-started" class="active">Getting Started</a>
+                    <a href="#file-format">File Format</a>
+                    <a href="#quick-start">Quick Start</a>
+                </div>
+            </div>
+
+            <div class="nav-group" id="group-features">
+                <button class="nav-title">
+                    Features
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="nav-links">
+                    <a href="#upload">Data Import</a>
+                    <a href="#columns">Column Selection</a>
+                    <a href="#single-mode">Single Grouping</a>
+                    <a href="#multiple-mode">Multiple Groupings</a>
+                    <a href="#export">Export Options</a>
+                </div>
+            </div>
+
+            <div class="nav-group" id="group-support">
+                <button class="nav-title">
+                    Support
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="nav-links">
+                    <a href="#faq">Frequently Asked Questions</a>
+                    <a href="#troubleshooting">Troubleshooting</a>
+                    <a href="#comparison">Feature Comparison</a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <div class="docs">
+                <h1>Documentation</h1>
+                <p class="lead">Complete guide to using GroupForge for all your group splitting needs.</p>
+
+                <div class="notice">
+                    Welcome to GroupForge Documentation. This guide will help you understand every feature from basic uploads to advanced multi-sheet exports.
+                </div>
+
+                <!-- Overview Section -->
+                <section id="overview">
+                    <h2>Overview</h2>
+                    <p>GroupForge is a web-based tool designed to split CSV or Excel member lists into balanced groups. Whether you are organizing students, managing event attendees, or creating team assignments, GroupForge streamlines the process.</p>
+                    <div class="feature-grid">
+                        <div class="feature-card"><strong>CSV and Excel Support</strong><br>Upload files in multiple formats</div>
+                        <div class="feature-card"><strong>Column Selection</strong><br>Keep only the data you need</div>
+                        <div class="feature-card"><strong>Single Grouping</strong><br>One consistent group size</div>
+                        <div class="feature-card"><strong>Multiple Groupings</strong><br>Generate multiple sheets with different sizes</div>
+                        <div class="feature-card"><strong>Excel Export</strong><br>Professional output with multiple sheets</div>
+                        <div class="feature-card"><strong>Privacy First</strong><br>All processing happens in your browser</div>
+                    </div>
+                </section>
+
+                <!-- Getting Started -->
+                <section id="getting-started">
+                    <h2>Getting Started</h2>
+                    <p>Follow these steps to create your first groups:</p>
+                    <ol>
+                        <li>Upload your CSV or Excel file by clicking the upload zone or dragging and dropping</li>
+                        <li>Select which columns you want to include in the output</li>
+                        <li>Choose between Single Grouping or Multiple Groupings mode</li>
+                        <li>Enter your desired group size or sizes</li>
+                        <li>Click Generate and Download Excel</li>
+                    </ol>
+                    <div class="code-block">
+                        <pre>1. Click or drag file to upload zone
+2. Select columns to keep
+3. Choose Single or Multiple grouping
+4. Enter group size(s)
+5. Click Generate and Download Excel</pre>
+                    </div>
+                </section>
+
+                <!-- File Format -->
+                <section id="file-format">
+                    <h2>File Format Requirements</h2>
+                    <p>GroupForge accepts the following file formats:</p>
+                    <ul>
+                        <li>CSV - Comma-separated values with header row</li>
+                        <li>Excel - .xlsx or .xls files with header row</li>
+                    </ul>
+                    <p>Your file must include a header row as the first row containing column names. Example:</p>
+                    <div class="code-block">
+                        <pre>Name,Index Number,Department,Email
+Emma Thompson,20240001,Computer Science,emma@university.edu
+David Chen,20240002,Computer Science,david@university.edu</pre>
+                    </div>
+                    <div class="tip-box">
+                        Any column can be used to identify members. The tool preserves all selected columns in the final output.
+                    </div>
+                </section>
+
+                <!-- Data Import -->
+                <section id="upload">
+                    <h2>Data Import</h2>
+                    <p>Uploading your data is straightforward:</p>
+                    <ul>
+                        <li>Click the upload zone and select your file from your computer</li>
+                        <li>Drag and drop your file directly onto the upload zone</li>
+                        <li>Supported formats include CSV, XLSX, and XLS</li>
+                    </ul>
+                    <p>Once uploaded, GroupForge automatically detects column headers and displays a preview of your data with the first 10 rows.</p>
+                </section>
+
+                <!-- Column Selection -->
+                <section id="columns">
+                    <h2>Column Selection</h2>
+                    <p>You can choose which columns to include in your groups:</p>
+                    <ul>
+                        <li>All columns are selected by default after upload</li>
+                        <li>Uncheck any columns you want to exclude from the output</li>
+                        <li>Use the Select All button to quickly toggle all columns</li>
+                        <li>The preview table shows the first 10 rows with your selected columns</li>
+                    </ul>
+                    <div class="tip-box">
+                        Removing unnecessary columns makes your output cleaner and easier to read.
+                    </div>
+                </section>
+
+                <!-- Single Grouping -->
+                <section id="single-mode">
+                    <h2>Single Grouping Mode</h2>
+                    <p>Create groups with one consistent size across all members:</p>
+                    <ul>
+                        <li>Enter the number of members per group</li>
+                        <li>The interface shows real-time group count as you type</li>
+                        <li>The last group may contain fewer members if the total is not divisible by the group size</li>
+                        <li>Output is a single Excel sheet containing all groups</li>
+                    </ul>
+                    <div class="code-block">
+                        <pre>Example: 30 members with 5 per group = 6 groups</pre>
+                    </div>
+                </section>
+
+                <!-- Multiple Groupings -->
+                <section id="multiple-mode">
+                    <h2>Multiple Groupings Mode</h2>
+                    <p>Create multiple group configurations within a single Excel file:</p>
+                    <ul>
+                        <li>Add multiple group sizes such as 3, 5, and 10 members per group</li>
+                        <li>Each configuration generates a separate sheet in the output file</li>
+                        <li>Customize sheet names for each configuration to keep things organized</li>
+                        <li>Ideal for comparing different grouping strategies side by side</li>
+                    </ul>
+                    <div class="code-block">
+                        <pre>Example Output Structure:
+Sheet 1: Groups of 3
+Sheet 2: Groups of 5
+Sheet 3: Groups of 10</pre>
+                    </div>
+                </section>
+
+                <!-- Export Options -->
+                <section id="export">
+                    <h2>Export Options</h2>
+                    <p>GroupForge exports to Excel format with the following characteristics:</p>
+                    <ul>
+                        <li>Single Mode produces one sheet named automatically</li>
+                        <li>Multiple Mode produces multiple sheets with custom or auto-generated names</li>
+                        <li>Each sheet displays groups with headers and member data</li>
+                        <li>Blank rows separate groups for improved readability</li>
+                    </ul>
+                    <div class="warning-box">
+                        Excel sheet names have a 31-character limit. Custom names exceeding this limit are automatically trimmed.
+                    </div>
+                </section>
+
+                <!-- FAQ -->
+                <section id="faq">
+                    <h2>Frequently Asked Questions</h2>
+                    
+                    <h3>What file size can I upload?</h3>
+                    <p>GroupForge handles files up to 200MB in the browser. For CSV files, this typically means hundreds of thousands of rows.</p>
+                    
+                    <h3>Does my data leave my computer?</h3>
+                    <p>No. All processing happens locally in your browser. Your data never leaves your computer, ensuring complete privacy and security.</p>
+                    
+                    <h3>Can I use GroupForge offline?</h3>
+                    <p>Yes. Once the page has loaded, GroupForge works without an internet connection.</p>
+                    
+                    <h3>What happens to the last group if it is incomplete?</h3>
+                    <p>The last group will contain the remaining members, even if the count is less than the specified group size.</p>
+                    
+                    <h3>Can I rename the output sheets?</h3>
+                    <p>Yes. In Multiple Groupings mode, each configuration includes a custom sheet name field.</p>
+                </section>
+
+                <!-- Troubleshooting -->
+                <section id="troubleshooting">
+                    <h2>Troubleshooting</h2>
+                    
+                    <h3>File will not upload</h3>
+                    <p>Ensure your file is in CSV or Excel format and includes a header row with column names.</p>
+                    
+                    <h3>Preview shows unexpected characters</h3>
+                    <p>Save your CSV file with UTF-8 encoding. Excel files should be standard .xlsx format.</p>
+                    
+                    <h3>Groups are not displaying correctly</h3>
+                    <p>Verify that you selected the correct column for member identification. The tool groups entire rows based on the selected column.</p>
+                    
+                    <div class="tip-box">
+                        For additional support, contact us at support@groupforge.com
+                    </div>
+                </section>
+
+                <!-- Feature Comparison -->
+                <section id="comparison">
+                    <h2>Feature Comparison</h2>
+                    <table class="feature-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Single Mode</th>
+                                <th>Multiple Mode</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Group size configuration</td><td>One size</td><td>Multiple sizes</td></tr>
+                            <tr><td>Output sheets</td><td>One sheet</td><td>Multiple sheets</td></tr>
+                            <tr><td>Custom sheet names</td><td>Not available</td><td>Available</td></tr>
+                            <tr><td>Real-time group count</td><td>Available</td><td>Available</td></tr>
+                            <tr><td>Column selection</td><td colspan="2">Available in both modes</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <p>GroupForge v1.0 | Intelligent Group Splitting Platform</p>
+    </footer>
+
+    <script>
+        // Mobile Menu Functions
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+
+        function openMenu() {
+            mobileMenu.classList.add('open');
+            menuOverlay.classList.add('active');
+            hamburgerBtn.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            mobileMenu.classList.remove('open');
+            menuOverlay.classList.remove('active');
+            hamburgerBtn.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (hamburgerBtn) hamburgerBtn.addEventListener('click', openMenu);
+        if (closeMenuBtn) closeMenuBtn.addEventListener('click', closeMenu);
+        if (menuOverlay) menuOverlay.addEventListener('click', closeMenu);
+
+        // Dropdown Sidebar Functionality
+        function initDropdowns() {
+            const groups = ['getting-started', 'features', 'support'];
+            
+            groups.forEach(groupId => {
+                const group = document.getElementById(`group-${groupId}`);
+                if (!group) return;
+                
+                const button = group.querySelector('.nav-title');
+                const linksDiv = group.querySelector('.nav-links');
+                
+                if (groupId === 'getting-started') {
+                    group.classList.add('open');
+                } else {
+                    group.classList.remove('open');
+                }
+                
+                button.addEventListener('click', () => {
+                    group.classList.toggle('open');
+                });
+            });
+        }
+
+        // Smooth scroll and active link highlighting
+        const sections = document.querySelectorAll('.docs section');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        function updateActiveLink() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionBottom = sectionTop + section.offsetHeight;
+                if (window.scrollY >= sectionTop && window.scrollY < sectionBottom) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                const href = link.getAttribute('href').substring(1);
+                if (href === current) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const hash = this.getAttribute('href');
+                if (hash && hash.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(hash);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                        closeMenu();
+                    }
+                }
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveLink);
+        updateActiveLink();
+        initDropdowns();
+    </script>
+</body>
+</html>
