@@ -153,7 +153,7 @@ function handleFile(file) {
         return;
     }
 
-    fileStatus.innerHTML = `📄 Loading: ${file.name}...`;
+    fileStatus.innerHTML = `Loading: ${file.name}...`;
     
     const reader = new FileReader();
     
@@ -181,7 +181,7 @@ function handleFile(file) {
                 }
             }
             
-            fileStatus.innerHTML = `✅ Loaded: ${file.name} (${currentRows.length} records)`;
+            fileStatus.innerHTML = `Loaded: ${file.name} (${currentRows.length} records)`;
             selectedColumns = [...currentHeaders];
             
             renderColumnSelector();
@@ -192,7 +192,7 @@ function handleFile(file) {
             updateStats();
             
         } catch (error) {
-            fileStatus.innerHTML = `❌ Error parsing file`;
+            fileStatus.innerHTML = `Error parsing file`;
             showAlert('Failed to parse file: ' + error.message, 'error');
         }
     };
@@ -395,7 +395,7 @@ generateBtn.addEventListener('click', () => {
     
     const fileName = `groupforge_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.xlsx`;
     XLSX.writeFile(workbook, fileName);
-    showAlert(`✅ File downloaded: ${fileName}`, 'success');
+    showAlert(`File downloaded: ${fileName}`, 'success');
 });
 
 function escapeHtml(str) {
