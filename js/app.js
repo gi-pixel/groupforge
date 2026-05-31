@@ -36,6 +36,10 @@ const menuOverlay = document.getElementById('menuOverlay');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
 const liveGroupCount = document.getElementById('liveGroupCount');
 const addSizeBtn = document.getElementById('addSizeBtn');
+const isAndroid = /Android/i.test(navigator.userAgent);
+const androidOptions = document.getElementById('androidOptions');
+const localFileBtn = document.getElementById('localFileBtn');
+const driveFileBtn = document.getElementById('driveFileBtn');
 
 
 // Upload handlers
@@ -63,6 +67,29 @@ fileInput.addEventListener('change', (e) => {
 
 if (singleGroupSizeInput) {
     singleGroupSizeInput.addEventListener('input', () => updateStats());
+}
+
+
+if (isAndroid && androidOptions) {
+    androidOptions.style.display = 'block';
+    
+
+    let preventDefaultClick = false;
+    
+    uploadZone.addEventListener('click', (e) => {
+        if (preventDefaultClick) return;
+        e.preventDefault();
+    });
+    
+    localFileBtn?.addEventListener('click', () => {
+        fileInput.setAttribute('accept', '.csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        fileInput.click();
+    });
+    
+    driveFileBtn?.addEventListener('click', () => {
+        fileInput.setAttribute('accept', '.csv,.xlsx,.xls');
+        fileInput.click();
+    });
 }
 
 
