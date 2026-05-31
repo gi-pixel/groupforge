@@ -36,6 +36,11 @@ const menuOverlay = document.getElementById('menuOverlay');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
 const liveGroupCount = document.getElementById('liveGroupCount');
 const addSizeBtn = document.getElementById('addSizeBtn');
+// ========== ANDROID FILE PICKER FIX ==========
+const isAndroid = /Android/i.test(navigator.userAgent);
+const androidOptionsDiv = document.getElementById('androidOptions');
+const localFileBtn = document.getElementById('localFileBtn');
+const driveFileBtn = document.getElementById('driveFileBtn');
 
 
 // Upload handlers
@@ -780,6 +785,51 @@ function updateConfigGroupCounts() {
             } else {
                 countSpan.textContent = '0';
             }
+        }
+    });
+}
+
+if (isAndroid && androidOptionsDiv) {
+    // Show the Android options
+    androidOptionsDiv.style.display = 'block';
+    
+    // Override upload zone click to not auto-open
+    const originalUploadClick = uploadZone.onclick;
+    uploadZone.onclick = (e) => {
+        e.preventDefault();
+        // Do nothing - let user click buttons instead
+    };
+    
+    // Local Files button - tries to access device storage
+    if (localFileBtn) {
+        localFileBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Clear any existing accept attributes
+            fileInput.removeAttribute('accept');
+            // Set for local files
+            fileInput.setAttribute('accept', '.csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            // Trigger file picker
+            fileInput.click();
+        });
+    }
+    
+    // Cloud Storage button
+    if (driveFileBtn) {
+        driveFileBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Clear accept to allow cloud pickers
+            fileInput.removeAttribute('accept');
+            // Trigger file picker
+            fileInput.click();
+        });
+    }
+    
+    // Also ensure the original file input change handler still works
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            handleFile(e.target.files[0]);
         }
     });
 }
