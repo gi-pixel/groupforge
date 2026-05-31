@@ -7,7 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/core.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
@@ -32,10 +34,15 @@
                     <div class="nav-links">
                         <a href="index.html" class="nav-link active">Workspace</a>
                         <a href="documentation.html" class="nav-link">Documentation</a>
-                        <a href="#" class="nav-link">Support</a>
+                        <a href="support.html" class="nav-link">Support</a>
                     </div>
+
+                    <button class="theme-toggle" id="themeToggle" aria-label="Dark mode">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
                     
-                    <div class="nav-placeholder"></div>
                 </div>
             
             <!-- Mobile Menu Overlay -->
@@ -230,6 +237,7 @@
         </div>
     </div>
 
+    <script src="js/global.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,142 @@
+/* ============================================
+   DARK-MODE.CSS - Shared across ALL pages
+   ============================================ */
+
+.dark-mode {
+    --gray-50: #0a0a0a;
+    --gray-100: #111111;
+    --gray-200: #1a1a1a;
+    --gray-300: #2a2a2a;
+    --gray-400: #3a3a3a;
+    --gray-500: #5a5a5a;
+    --gray-600: #8a8a8a;
+    --gray-700: #b0b0b0;
+    --gray-800: #d0d0d0;
+    --gray-900: #e8e8e8;
+    --white: #0a0a0a;
+    --indigo-50: #1a1a2e;
+    --indigo-100: #252542;
+    --indigo-200: #2d2d5a;
+    --indigo-300: #4040b0;
+    --indigo-400: #5a5ae0;
+    --indigo-500: #6e6eff;
+    --indigo-600: #8888ff;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.6);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.7);
+}
+
+.dark-mode body {
+    background: #0a0a0a;
+}
+
+.dark-mode .navbar {
+    background: rgba(10, 10, 10, 0.98);
+    border-bottom-color: #1a1a1a;
+}
+
+.dark-mode .card,
+.dark-mode .coming-soon-card,
+.dark-mode .feature-card,
+.dark-mode .config-item,
+.dark-mode .column-checkbox,
+.dark-mode .mode-option,
+.dark-mode .sidebar .nav-group,
+.dark-mode .notice,
+.dark-mode .tip-box,
+.dark-mode .warning-box,
+.dark-mode .stats-bar,
+.dark-mode .mode-switch {
+    background: #111111;
+    border-color: #1a1a1a;
+}
+
+.dark-mode .upload-zone {
+    background: #1a1a1a;
+    border-color: #2a2a2a;
+}
+
+.dark-mode .upload-zone:hover {
+    background: #222222;
+}
+
+.dark-mode .code-block {
+    background: #0a0a0a;
+    color: #6e6eff;
+}
+
+.dark-mode input,
+.dark-mode select,
+.dark-mode .sheet-name-input,
+.dark-mode .size-item input {
+    background: #1a1a1a;
+    border-color: #2a2a2a;
+    color: #d0d0d0;
+}
+
+.dark-mode .nav-link,
+.dark-mode .sidebar-link,
+.dark-mode .mobile-nav-link {
+    color: #8a8a8a;
+}
+
+.dark-mode .nav-link:hover,
+.dark-mode .nav-link.active,
+.dark-mode .sidebar-link:hover,
+.dark-mode .mobile-nav-link.active {
+    color: var(--indigo-500);
+}
+
+.dark-mode .btn-generate {
+    background: linear-gradient(135deg, #4040b0 0%, #2d2d5a 100%);
+}
+
+.dark-mode .btn-generate:hover {
+    background: linear-gradient(135deg, #5a5ae0 0%, #4040b0 100%);
+}
+
+.dark-mode .mode-option.active {
+    background: linear-gradient(135deg, #1a1a2e 0%, #111111 100%);
+    border-color: var(--indigo-500);
+    color: var(--indigo-500);
+}
+
+.dark-mode .theme-toggle svg {
+    stroke: var(--gray-400);
+}
+
+.dark-mode .footer {
+    border-top-color: #1a1a1a;
+    color: #5a5a5a;
+}
+
+.dark-mode .hero {
+    background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%);
+}
+
+.dark-mode .feature-table th {
+    background: #1a1a1a;
+    color: #d0d0d0;
+}
+
+.dark-mode .feature-table td {
+    border-bottom-color: #1a1a1a;
+}
+
+.dark-mode ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.dark-mode ::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+    background: #3a3a3a;
+    border-radius: 4px;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: var(--indigo-500);
+}

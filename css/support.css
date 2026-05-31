@@ -1,0 +1,71 @@
+/* ============================================
+   SUPPORT.CSS - Support page only
+   ============================================ */
+
+/* Channels Preview */
+.channels-preview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 2rem 0 1.5rem;
+    text-align: left;
+}
+
+.channel-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.channel-item svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--indigo-600);
+}
+
+.channel-item span {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.channel-item small {
+    font-size: 0.65rem;
+    color: var(--gray-400);
+}
+
+/* Emergency Contact */
+.emergency-contact {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+.emergency-contact p {
+    font-size: 0.7rem;
+    margin-bottom: 0.25rem;
+}
+
+.emergency-contact a {
+    color: var(--indigo-600);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.emergency-contact a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Support */
+@media (max-width: 768px) {
+    .channels-preview {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+}
