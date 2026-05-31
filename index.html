@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/dark-mode.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="560755f9-4e1f-46f4-b4d9-fcd3adaf59e9"></script>
 </head>
 <body>
     <div class="app">
@@ -95,6 +96,16 @@
                     <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" hidden>
                     <div class="file-status" id="fileStatus"></div>
                 </div>
+
+                <!-- Android Single Button (hidden by default) -->
+                <div id="androidUploadContainer" style="display: none; margin: 0 1rem 1rem 1rem;">
+                    <button id="androidUploadBtn" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--indigo-500) 0%, var(--indigo-600) 100%); border: none; border-radius: var(--radius-md); cursor: pointer; font-size: 1rem; font-weight: 600; color: white;">
+                        Select File to Upload
+                    </button>
+                    <p style="font-size: 0.7rem; color: var(--gray-500); text-align: center; margin-top: 0.75rem;">
+                        Tap to choose file from device, Google Drive, or cloud storage
+                    </p>
+                </div>
             </div>
 
             <!-- Data Preview Card -->
@@ -145,8 +156,20 @@
                             <path d="M4 12H20V16L12 21L4 16V12Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
                         </svg>
                         Multiple
+                        
                     </button>
                 </div>
+
+                <!-- Duplicate Detection Settings -->
+<div class="duplicate-settings" id="duplicateSettings" style="display: none;">
+    <div class="setting-label">
+        <span>🔍 Check for duplicates in:</span>
+    </div>
+    <div class="duplicate-columns-grid" id="duplicateColumnsGrid">
+        <!-- Checkboxes will be populated dynamically -->
+    </div>
+    <small class="setting-hint">Duplicates detected when ALL selected columns match (case-insensitive). Unchecked duplicates will be removed.</small>
+</div>
 
                 <!-- Single Mode -->
                 <div class="mode-content" id="singleMode">
@@ -237,7 +260,39 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <script src="js/global.js"></script>
+=======
+    <!-- Duplicate Detection Modal -->
+<div class="modal-overlay" id="duplicateModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3>Duplicate Members Detected</h3>
+            <button class="modal-close" id="closeModalBtn">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- Duplicate groups will be inserted here -->
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-secondary" id="cancelModalBtn">Cancel Generation</button>
+            <button class="modal-btn modal-btn-primary" id="confirmDuplicateBtn">Remove Unchecked & Continue</button>
+        </div>
+    </div>
+</div>
+
+<!-- Shuffle Modal -->
+<div class="shuffle-modal-overlay" id="shuffleModal">
+    <div class="shuffle-modal-container">
+        <h3>Randomize Order?</h3>
+        <p>Do you want to shuffle (randomize) the member list before grouping?</p>
+        <div class="shuffle-buttons">
+            <button class="shuffle-btn shuffle-btn-yes" id="shuffleYesBtn">Yes, Shuffle</button>
+            <button class="shuffle-btn shuffle-btn-no" id="shuffleNoBtn">No, Keep Order</button>
+        </div>
+    </div>
+</div>
+
+>>>>>>> 8053b586add1575d282c471ee212c47a141a2901
     <script src="js/app.js"></script>
 </body>
 </html>

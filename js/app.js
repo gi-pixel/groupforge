@@ -3,6 +3,12 @@ let currentHeaders = [];
 let currentRows = [];
 let selectedColumns = [];
 let currentMode = 'single';
+let duplicateColumns = [];
+let pendingDuplicateResolve = null;
+let pendingShuffleResolve = null;
+let pendingDuplicateData = null;
+let pendingResolveCallback = null; 
+let cleanedMembers = [];
 
 
 const uploadZone = document.getElementById('uploadZone');
@@ -30,6 +36,10 @@ const menuOverlay = document.getElementById('menuOverlay');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
 const liveGroupCount = document.getElementById('liveGroupCount');
 const addSizeBtn = document.getElementById('addSizeBtn');
+// ========== ANDROID FILE PICKER FIX ==========
+const isAndroid = /Android/i.test(navigator.userAgent);
+const androidContainer = document.getElementById('androidUploadContainer');
+const androidBtn = document.getElementById('androidUploadBtn');
 
 
 // Upload handlers
@@ -144,6 +154,43 @@ function handleSizeInputChange() {
 }
 
 
+function populateDuplicateColumns() {
+    const container = document.getElementById('duplicateColumnsGrid');
+    const settingsDiv = document.getElementById('duplicateSettings');
+    
+    if (!container || !currentHeaders.length) return;
+    
+    container.innerHTML = '';
+    duplicateColumns = [];
+    
+    currentHeaders.forEach(header => {
+        const div = document.createElement('div');
+        div.className = 'duplicate-checkbox';
+        div.innerHTML = `
+            <input type="checkbox" class="duplicate-col-check" value="${header}" id="dup_${header}">
+            <label for="dup_${header}">${header}</label>
+        `;
+        container.appendChild(div);
+    });
+    
+    const firstCheckbox = container.querySelector('.duplicate-col-check');
+    if (firstCheckbox) {
+        firstCheckbox.checked = true;
+        duplicateColumns = [firstCheckbox.value];
+    }
+    
+    document.querySelectorAll('.duplicate-col-check').forEach(cb => {
+        cb.addEventListener('change', () => {
+            duplicateColumns = Array.from(document.querySelectorAll('.duplicate-col-check:checked'))
+                .map(cb => cb.value);
+        });
+    });
+    
+    settingsDiv.style.display = 'block';
+}
+
+
+
 // File handling
 function handleFile(file) {
     const extension = file.name.split('.').pop().toLowerCase();
@@ -185,6 +232,8 @@ function handleFile(file) {
             selectedColumns = [...currentHeaders];
             
             renderColumnSelector();
+            // Add this line inside your handleFile() function after renderColumnSelector()
+            populateDuplicateColumns();
             renderPreview();
             
             dataCard.style.display = 'block';
@@ -352,7 +401,219 @@ function bindSizeInputEvents() {
     });
 }
 
-generateBtn.addEventListener('click', () => {
+
+// ========== DETECT DUPLICATES IN ORIGINAL LIST (BY ROW NUMBER) ==========
+function detectDuplicatesInList(members) {
+    const duplicates = [];
+    const seen = new Map();
+    
+    for (let rowIdx = 0; rowIdx < members.length; rowIdx++) {
+        const member = members[rowIdx];
+        
+        const keyParts = duplicateColumns.map(col => {
+            let val = member[col] || '';
+            return String(val).trim().toLowerCase();
+        });
+        const key = keyParts.join('|');
+        
+        if (seen.has(key)) {
+            const existing = seen.get(key);
+            if (!existing.duplicateGroup) {
+                const newDuplicate = {
+                    key: key,
+                    displayName: keyParts.join(' | '),
+                    occurrences: [
+                        { rowIndex: existing.rowIndex, rowNumber: existing.rowIndex + 1, member: existing.member },
+                        { rowIndex: rowIdx, rowNumber: rowIdx + 1, member: member }
+                    ]
+                };
+                duplicates.push(newDuplicate);
+                existing.duplicateGroup = newDuplicate;
+            } else {
+                existing.duplicateGroup.occurrences.push({ rowIndex: rowIdx, rowNumber: rowIdx + 1, member: member });
+            }
+        } else {
+            seen.set(key, { rowIndex: rowIdx, member: member, duplicateGroup: null });
+        }
+    }
+    
+    return duplicates;
+}
+
+// ========== SHOW DUPLICATE MODAL ==========
+// ========== SHOW DUPLICATE MODAL ==========
+function showDuplicateModal(duplicates) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('duplicateModal');
+        const modalBody = document.getElementById('modalBody');
+        
+        if (!modal || !modalBody || duplicates.length === 0) {
+            resolve(null);
+            return;
+        }
+        
+        let html = '';
+        
+        duplicates.forEach((dup, idx) => {
+            html += `
+                <div class="duplicate-group" data-dup-index="${idx}">
+                    <div class="duplicate-title">
+                        ⚠️ Duplicate: ${escapeHtml(dup.displayName)}
+                    </div>
+                    <div class="select-all-row">
+                        <input type="checkbox" class="select-all-dup" data-dup="${idx}" id="selectAll_${idx}">
+                        <label for="selectAll_${idx}"><strong>Select / Deselect All</strong></label>
+                    </div>
+                    <div class="duplicate-options">
+            `;
+            
+            dup.occurrences.forEach((occ, occIdx) => {
+                const details = duplicateColumns.map(col => `${col}: ${occ.member[col] || '-'}`).join(' | ');
+                html += `
+                    <div class="duplicate-option">
+                        <input type="checkbox" class="dup-checkbox" data-dup="${idx}" data-occ="${occIdx}" checked>
+                        <label><strong>Row ${occ.rowNumber}</strong> - ${escapeHtml(details)}</label>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+        });
+        
+        modalBody.innerHTML = html;
+        modal.classList.add('active');
+        
+        document.querySelectorAll('.select-all-dup').forEach(btn => {
+            btn.addEventListener('change', (e) => {
+                const dupIdx = e.target.getAttribute('data-dup');
+                const checkboxes = document.querySelectorAll(`.dup-checkbox[data-dup="${dupIdx}"]`);
+                checkboxes.forEach(cb => cb.checked = e.target.checked);
+            });
+        });
+
+        pendingDuplicateData = duplicates;
+        
+         pendingResolveCallback = resolve;
+    });
+}
+
+
+// ========== PROCESS DUPLICATE SELECTION ==========
+function processDuplicateSelection() {
+    const modal = document.getElementById('duplicateModal');
+    if (!modal || !pendingDuplicateData) return;
+    
+    const toKeep = [];
+    
+    pendingDuplicateData.forEach((dup, dupIdx) => {
+        const checkboxes = document.querySelectorAll(`.dup-checkbox[data-dup="${dupIdx}"]`);
+        const checkedIndices = [];
+        checkboxes.forEach((cb, idx) => {
+            if (cb.checked) checkedIndices.push(idx);
+        });
+        toKeep.push({ dupIdx, checkedIndices });
+    });
+    
+    modal.classList.remove('active');
+    
+    if (pendingResolveCallback) {
+        pendingResolveCallback(toKeep);
+    }
+    
+    pendingDuplicateData = null;
+    pendingResolveCallback = null;
+}
+
+
+
+
+// ========== REMOVE UNCHECKED DUPLICATES FROM MEMBERS ==========
+function removeUncheckedDuplicatesFromMembers(members, toKeep, duplicates) {
+    const rowsToRemove = new Set();
+    
+    toKeep.forEach(item => {
+        const duplicate = duplicates[item.dupIdx];
+        for (let i = 0; i < duplicate.occurrences.length; i++) {
+            if (!item.checkedIndices.includes(i)) {
+                rowsToRemove.add(duplicate.occurrences[i].rowIndex);
+            }
+        }
+    });
+    
+    const sortedRowsToRemove = Array.from(rowsToRemove).sort((a, b) => b - a);
+    const cleanedMembers = [...members];
+    
+    for (const rowIdx of sortedRowsToRemove) {
+        cleanedMembers.splice(rowIdx, 1);
+    }
+    
+    return cleanedMembers;
+}
+
+// ========== UPDATE PREVIEW AFTER CLEANING ==========
+function updatePreviewAfterCleaning(cleanedMembers) {
+    currentRows = cleanedMembers;
+    renderPreview();
+    updateStats();
+    showAlert(`Cleaned data: ${cleanedMembers.length} members remaining`, 'success');
+}
+
+function showShuffleModal() {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('shuffleModal');
+        if (!modal) {
+            resolve(false);
+            return;
+        }
+        
+        modal.classList.add('active');
+        
+        const handleYes = () => {
+            modal.classList.remove('active');
+            cleanup();
+            resolve(true);
+        };
+        
+        const handleNo = () => {
+            modal.classList.remove('active');
+            cleanup();
+            resolve(false);
+        };
+        
+        const cleanup = () => {
+            document.getElementById('shuffleYesBtn')?.removeEventListener('click', handleYes);
+            document.getElementById('shuffleNoBtn')?.removeEventListener('click', handleNo);
+        };
+        
+        document.getElementById('shuffleYesBtn')?.addEventListener('click', handleYes, { once: true });
+        document.getElementById('shuffleNoBtn')?.addEventListener('click', handleNo, { once: true });
+    });
+}
+
+document.getElementById('closeModalBtn')?.addEventListener('click', () => {
+    const modal = document.getElementById('duplicateModal');
+    if (modal) modal.classList.remove('active');
+    if (pendingResolveCallback) pendingResolveCallback(null);
+    pendingDuplicateData = null;
+    pendingResolveCallback = null;
+});
+
+document.getElementById('cancelModalBtn')?.addEventListener('click', () => {
+    const modal = document.getElementById('duplicateModal');
+    if (modal) modal.classList.remove('active');
+    if (pendingResolveCallback) pendingResolveCallback(null);
+    pendingDuplicateData = null;
+    pendingResolveCallback = null;
+});
+
+document.getElementById('confirmDuplicateBtn')?.addEventListener('click', processDuplicateSelection);
+
+
+// ========== GENERATE BUTTON ==========
+generateBtn.addEventListener('click', async () => {
     if (!currentRows.length) {
         showAlert('No data loaded', 'error');
         return;
@@ -363,7 +624,14 @@ generateBtn.addEventListener('click', () => {
         return;
     }
     
-    const members = currentRows.map(row => {
+    const configs = getGroupConfigs();
+    if (configs.length === 0) {
+        showAlert('Please add at least one valid group configuration', 'error');
+        return;
+    }
+    
+    // Step 1: Start with original members
+    let workingMembers = currentRows.map(row => {
         const newRow = {};
         selectedColumns.forEach(col => {
             newRow[col] = row[col];
@@ -371,22 +639,57 @@ generateBtn.addEventListener('click', () => {
         return newRow;
     });
     
-    const configs = getGroupConfigs();
-    if (configs.length === 0) {
-        showAlert('Please add at least one valid group configuration', 'error');
-        return;
+    // Step 2: Check for duplicates if columns are selected
+    if (duplicateColumns.length > 0) {
+        const duplicates = detectDuplicatesInList(workingMembers);
+        
+        if (duplicates.length > 0) {
+            pendingDuplicateData = duplicates;
+            const toKeep = await showDuplicateModal(duplicates);
+            
+            if (toKeep && toKeep.length > 0) {
+                workingMembers = removeUncheckedDuplicatesFromMembers(workingMembers, toKeep, duplicates);
+                updatePreviewAfterCleaning(workingMembers);
+                
+                let removedCount = 0;
+                duplicates.forEach((dup, idx) => {
+                    const kept = toKeep.find(t => t.dupIdx === idx);
+                    if (kept) {
+                        removedCount += dup.occurrences.length - kept.checkedIndices.length;
+                    } else {
+                        removedCount += dup.occurrences.length;
+                    }
+                });
+                showAlert(`Removed ${removedCount} duplicate entr${removedCount === 1 ? 'y' : 'ies'}`, 'success');
+            } else {
+                showAlert('Duplicate resolution cancelled. Generation aborted.', 'error');
+                return;
+            }
+        }
     }
     
+    // Step 3: Ask for shuffle
+    const shouldShuffle = await showShuffleModal();
+    if (shouldShuffle) {
+        for (let i = workingMembers.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [workingMembers[i], workingMembers[j]] = [workingMembers[j], workingMembers[i]];
+        }
+        showAlert('Member list shuffled', 'success');
+        renderPreview();
+    }
+    
+    // Step 4: Create workbook and export using workingMembers
     const workbook = XLSX.utils.book_new();
     
     if (currentMode === 'single') {
-        const groups = createGroups(members, configs[0].size);
+        const groups = createGroups(workingMembers, configs[0].size);
         const sheetData = formatSheetData(groups, selectedColumns);
         const worksheet = XLSX.utils.aoa_to_sheet(sheetData);
         XLSX.utils.book_append_sheet(workbook, worksheet, configs[0].sheetName);
     } else {
         configs.forEach(config => {
-            const groups = createGroups(members, config.size);
+            const groups = createGroups(workingMembers, config.size);
             const sheetData = formatSheetData(groups, selectedColumns);
             const worksheet = XLSX.utils.aoa_to_sheet(sheetData);
             XLSX.utils.book_append_sheet(workbook, worksheet, config.sheetName);
@@ -395,7 +698,7 @@ generateBtn.addEventListener('click', () => {
     
     const fileName = `groupforge_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.xlsx`;
     XLSX.writeFile(workbook, fileName);
-    showAlert(`File downloaded: ${fileName}`, 'success');
+    showAlert(`✅ File downloaded: ${fileName}`, 'success');
 });
 
 function escapeHtml(str) {
@@ -483,4 +786,46 @@ function updateConfigGroupCounts() {
             }
         }
     });
+}
+
+if (isAndroid && androidContainer) {
+    // Show the Android button
+    androidContainer.style.display = 'block';
+    
+    // HIDE the default upload zone completely on Android
+    const uploadZone = document.getElementById('uploadZone');
+    if (uploadZone) {
+        uploadZone.style.display = 'none';
+    }
+    
+    // Make button bigger
+    if (androidBtn) {
+        androidBtn.style.padding = '1rem';
+        androidBtn.style.fontSize = '1rem';
+        androidBtn.style.fontWeight = '600';
+    }
+    
+    // Android button click handler
+    if (androidBtn) {
+        androidBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Create fresh file input each time
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            fileInput.style.display = 'none';
+            document.body.appendChild(fileInput);
+            
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    handleFile(e.target.files[0]);
+                }
+                document.body.removeChild(fileInput);
+            });
+            
+            fileInput.click();
+        });
+    }
 }
