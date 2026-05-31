@@ -792,15 +792,17 @@ if (isAndroid && androidContainer) {
     // Show the Android button
     androidContainer.style.display = 'block';
     
-    // Disable the default upload zone (keep it visible but non-functional)
+    // HIDE the default upload zone completely on Android
     const uploadZone = document.getElementById('uploadZone');
     if (uploadZone) {
-        uploadZone.style.opacity = '0.5';
-        uploadZone.style.cursor = 'default';
-        uploadZone.onclick = (e) => {
-            e.preventDefault();
-            return false;
-        };
+        uploadZone.style.display = 'none';
+    }
+    
+    // Make button bigger
+    if (androidBtn) {
+        androidBtn.style.padding = '1rem';
+        androidBtn.style.fontSize = '1rem';
+        androidBtn.style.fontWeight = '600';
     }
     
     // Android button click handler
