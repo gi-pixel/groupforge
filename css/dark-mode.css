@@ -101,10 +101,6 @@
     color: var(--indigo-500);
 }
 
-.dark-mode .theme-toggle svg {
-    stroke: var(--gray-400);
-}
-
 .dark-mode .footer {
     border-top-color: #1a1a1a;
     color: #5a5a5a;
@@ -139,4 +135,29 @@
 
 .dark-mode ::-webkit-scrollbar-thumb:hover {
     background: var(--indigo-500);
+}
+
+/* ========== FIX: DARK MODE TOGGLE BUTTON VISIBILITY ========== */
+.dark-mode .theme-toggle {
+    background: #2a2a2a;
+    border-color: #5a5a5a;
+}
+
+.dark-mode .theme-toggle:hover {
+    background: #3a3a3a;
+    border-color: var(--indigo-500);
+}
+
+.dark-mode .theme-toggle svg {
+    stroke: #ffffff;
+}
+
+/* Light mode toggle button (ensure contrast) */
+.theme-toggle {
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+}
+
+.theme-toggle svg {
+    stroke: #1a1a1a;
 }

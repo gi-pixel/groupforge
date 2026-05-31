@@ -48,7 +48,7 @@ body {
     min-height: 100vh;
 }
 
-/* ========== NAVIGATION ========== */
+/* ========== NAVIGATION (All Pages) ========== */
 .navbar {
     background: var(--white);
     border-bottom: 1px solid var(--gray-200);
@@ -56,7 +56,6 @@ body {
     top: 0;
     z-index: 100;
     backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.98);
 }
 
 .nav-container {
@@ -91,6 +90,7 @@ body {
     color: var(--indigo-600);
 }
 
+/* Desktop Navigation */
 .nav-links {
     display: flex;
     gap: 2rem;
@@ -100,16 +100,9 @@ body {
     color: var(--gray-600);
     text-decoration: none;
     font-weight: 500;
+    font-size: 1rem;
     transition: color 0.2s;
 }
-
-/* .nav-links a {
-    color: var(--gray-600);
-    text-decoration: none;
-    padding: 0.6rem 0.85rem;
-    border-radius: var(--radius-sm);
-    transition: all 0.2s;
-} */
 
 .nav-link:hover,
 .nav-link.active {
@@ -145,7 +138,7 @@ body {
     fill: none;
 }
 
-/* ========== MOBILE MENU ========== */
+/* ========== MOBILE MENU (All Pages) ========== */
 .hamburger {
     display: none;
     background: var(--white);
@@ -196,7 +189,7 @@ body {
     transition: left 0.3s ease;
     display: flex;
     flex-direction: column;
-
+    overflow-y: auto;
 }
 
 .mobile-menu.open {
@@ -291,7 +284,7 @@ body {
     display: block;
 }
 
-/* ========== HERO SECTION ========== */
+/* ========== HERO SECTION (Documentation & Support Pages) ========== */
 .hero {
     text-align: center;
     padding: 2rem 1rem;
@@ -310,7 +303,7 @@ body {
     color: var(--gray-600);
 }
 
-/* ========== FOOTER ========== */
+/* ========== FOOTER (All Pages) ========== */
 .footer {
     text-align: center;
     padding: 2rem;
@@ -319,7 +312,7 @@ body {
     font-size: 0.75rem;
 }
 
-/* ========== COMING SOON STYLES ========== */
+/* ========== COMING SOON STYLES (Documentation & Support Pages) ========== */
 .coming-soon {
     display: flex;
     align-items: center;
@@ -420,7 +413,7 @@ body {
     color: var(--indigo-700);
 }
 
-/* ========== RESPONSIVE (CORE) ========== */
+/* ========== RESPONSIVE (Core - Affects All Pages) ========== */
 @media (max-width: 768px) {
     .hamburger {
         display: flex;
@@ -430,12 +423,21 @@ body {
         display: none !important;
     }
 
+    .nav-link,
+    .mobile-nav-link {
+        font-size: 0.95rem;
+    }
+
     .nav-container {
         padding: 0.75rem 1rem;
     }
 
     .hero h1 {
         font-size: 1.5rem;
+    }
+
+    .hero p {
+        font-size: 0.8rem;
     }
 
     .coming-soon {

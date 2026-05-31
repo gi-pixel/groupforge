@@ -1,6 +1,6 @@
 /* ============================================
-   GLOBAL.JS - Shared across ALL pages
-   Handles: Dark Mode, Mobile Menu, Navigation
+   CORE.JS - Shared across ALL pages
+   Handles: Dark Mode, Mobile Menu, Navigation, Dropdown Sidebar, Smooth Scroll
    ============================================ */
 
 (function() {
@@ -11,7 +11,7 @@
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
     const savedTheme = localStorage.getItem('theme');
     
-    // Apply saved theme or system preference
+    // Apply theme on page load
     if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark-mode');
     } else if (savedTheme === 'light') {
@@ -26,26 +26,26 @@
         const isDark = document.documentElement.classList.contains('dark-mode');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
         
-        // Update mobile toggle button text if exists
+        // Update mobile toggle button if exists
         const mobileToggle = document.getElementById('mobileThemeToggle');
         if (mobileToggle) {
             mobileToggle.innerHTML = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
         }
     };
     
-    // Add click event to theme toggle button
+    // Add event listener to main toggle button
     if (themeToggle) {
         themeToggle.addEventListener('click', window.toggleTheme);
     }
     
-    // Mobile theme toggle (if exists in mobile menu)
+    // Handle mobile toggle if exists
     const mobileToggle = document.getElementById('mobileThemeToggle');
     if (mobileToggle) {
         mobileToggle.addEventListener('click', window.toggleTheme);
         const isDark = document.documentElement.classList.contains('dark-mode');
         mobileToggle.innerHTML = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
     }
-    
+
     // ========== MOBILE MENU ==========
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const mobileMenu = document.getElementById('mobileMenu');
@@ -66,17 +66,9 @@
         document.body.style.overflow = '';
     }
     
-    if (hamburgerBtn) {
-        hamburgerBtn.addEventListener('click', openMenu);
-    }
-    
-    if (closeMenuBtn) {
-        closeMenuBtn.addEventListener('click', closeMenu);
-    }
-    
-    if (menuOverlay) {
-        menuOverlay.addEventListener('click', closeMenu);
-    }
+    if (hamburgerBtn) hamburgerBtn.addEventListener('click', openMenu);
+    if (closeMenuBtn) closeMenuBtn.addEventListener('click', closeMenu);
+    if (menuOverlay) menuOverlay.addEventListener('click', closeMenu);
     
     // Close mobile menu when clicking on navigation links
     document.querySelectorAll('.mobile-nav-link').forEach(link => {
@@ -93,7 +85,7 @@
     });
     
     // ========== SMOOTH SCROLL (for documentation page) ==========
-    document.querySelectorAll('.sidebar-link, .toc-link, .back-link').forEach(link => {
+    document.querySelectorAll('.sidebar-link, .back-link').forEach(link => {
         link.addEventListener('click', function(e) {
             const hash = this.getAttribute('href');
             if (hash && hash.startsWith('#')) {
@@ -101,7 +93,6 @@
                 const target = document.querySelector(hash);
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth' });
-                    // Update URL without jumping
                     history.pushState(null, null, hash);
                 }
             }
@@ -116,7 +107,6 @@
             if (button && !group.hasAttribute('data-initialized')) {
                 group.setAttribute('data-initialized', 'true');
                 
-                // Open first group by default (Getting Started)
                 const isFirst = group.id === 'group-getting-started';
                 if (isFirst) {
                     group.classList.add('open');
@@ -130,7 +120,6 @@
         });
     }
     
-    // Run dropdown init when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initDropdowns);
     } else {
@@ -167,4 +156,23 @@
         updateActiveLink();
     }
     
+    // ========== SHOW ALERT (Shared) ==========
+    window.showAlert = function(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.innerHTML = message;
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 3000);
+    };
+    
+    // ========== ESCAPE HTML (Shared) ==========
+    window.escapeHtml = function(str) {
+        if (!str) return '-';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    };
 })();
