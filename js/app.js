@@ -38,9 +38,8 @@ const liveGroupCount = document.getElementById('liveGroupCount');
 const addSizeBtn = document.getElementById('addSizeBtn');
 // ========== ANDROID FILE PICKER FIX ==========
 const isAndroid = /Android/i.test(navigator.userAgent);
-const androidOptionsDiv = document.getElementById('androidOptions');
-const localFileBtn = document.getElementById('localFileBtn');
-const driveFileBtn = document.getElementById('driveFileBtn');
+const androidContainer = document.getElementById('androidUploadContainer');
+const androidBtn = document.getElementById('androidUploadBtn');
 
 
 // Upload handlers
@@ -789,65 +788,42 @@ function updateConfigGroupCounts() {
     });
 }
 
-if (isAndroid && androidOptionsDiv) {
-    // Show Android options
-    androidOptionsDiv.style.display = 'block';
+if (isAndroid && androidContainer) {
+    // Show the Android button
+    androidContainer.style.display = 'block';
     
-    // HIDE the default upload zone click behavior completely
-    // Remove all existing listeners by replacing with new one that does nothing
-    const newUploadZone = uploadZone.cloneNode(true);
-    uploadZone.parentNode.replaceChild(newUploadZone, uploadZone);
-    
-    // Re-assign the variable to the new element
-    const freshUploadZone = document.getElementById('uploadZone');
-    
-    // Fresh upload zone just shows message but doesn't trigger file picker
-    freshUploadZone.style.cursor = 'default';
-    freshUploadZone.style.opacity = '0.7';
-    
-    // Local Files button
-    if (localFileBtn) {
-        localFileBtn.addEventListener('click', function(e) {
+    // Disable the default upload zone (keep it visible but non-functional)
+    const uploadZone = document.getElementById('uploadZone');
+    if (uploadZone) {
+        uploadZone.style.opacity = '0.5';
+        uploadZone.style.cursor = 'default';
+        uploadZone.onclick = (e) => {
             e.preventDefault();
-            e.stopPropagation();
-            // Create a new file input dynamically each time (bypasses browser restrictions)
-            const tempInput = document.createElement('input');
-            tempInput.type = 'file';
-            tempInput.accept = '.csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-            tempInput.style.display = 'none';
-            document.body.appendChild(tempInput);
-            
-            tempInput.addEventListener('change', function(e) {
-                if (e.target.files && e.target.files[0]) {
-                    handleFile(e.target.files[0]);
-                }
-                document.body.removeChild(tempInput);
-            });
-            
-            tempInput.click();
-        });
+            return false;
+        };
     }
     
-    // Cloud Storage button
-    if (driveFileBtn) {
-        driveFileBtn.addEventListener('click', function(e) {
+    // Android button click handler
+    if (androidBtn) {
+        androidBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            // Create a new file input dynamically
-            const tempInput = document.createElement('input');
-            tempInput.type = 'file';
-            tempInput.accept = '.csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-            tempInput.style.display = 'none';
-            document.body.appendChild(tempInput);
             
-            tempInput.addEventListener('change', function(e) {
+            // Create fresh file input each time
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            fileInput.style.display = 'none';
+            document.body.appendChild(fileInput);
+            
+            fileInput.addEventListener('change', function(e) {
                 if (e.target.files && e.target.files[0]) {
                     handleFile(e.target.files[0]);
                 }
-                document.body.removeChild(tempInput);
+                document.body.removeChild(fileInput);
             });
             
-            tempInput.click();
+            fileInput.click();
         });
     }
 }
