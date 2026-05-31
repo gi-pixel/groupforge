@@ -961,6 +961,12 @@ body {
 .shuffle-btn-yes:hover {
     transform: translateY(-1px);
 }
+
+
+.android-upload-btn:active {
+    transform: scale(0.98);
+    background: var(--gray-100);
+}
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
     .hamburger {

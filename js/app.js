@@ -790,46 +790,64 @@ function updateConfigGroupCounts() {
 }
 
 if (isAndroid && androidOptionsDiv) {
-    // Show the Android options
+    // Show Android options
     androidOptionsDiv.style.display = 'block';
     
-    // Override upload zone click to not auto-open
-    const originalUploadClick = uploadZone.onclick;
-    uploadZone.onclick = (e) => {
-        e.preventDefault();
-        // Do nothing - let user click buttons instead
-    };
+    // HIDE the default upload zone click behavior completely
+    // Remove all existing listeners by replacing with new one that does nothing
+    const newUploadZone = uploadZone.cloneNode(true);
+    uploadZone.parentNode.replaceChild(newUploadZone, uploadZone);
     
-    // Local Files button - tries to access device storage
+    // Re-assign the variable to the new element
+    const freshUploadZone = document.getElementById('uploadZone');
+    
+    // Fresh upload zone just shows message but doesn't trigger file picker
+    freshUploadZone.style.cursor = 'default';
+    freshUploadZone.style.opacity = '0.7';
+    
+    // Local Files button
     if (localFileBtn) {
-        localFileBtn.addEventListener('click', (e) => {
+        localFileBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            // Clear any existing accept attributes
-            fileInput.removeAttribute('accept');
-            // Set for local files
-            fileInput.setAttribute('accept', '.csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            // Trigger file picker
-            fileInput.click();
+            // Create a new file input dynamically each time (bypasses browser restrictions)
+            const tempInput = document.createElement('input');
+            tempInput.type = 'file';
+            tempInput.accept = '.csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            tempInput.style.display = 'none';
+            document.body.appendChild(tempInput);
+            
+            tempInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    handleFile(e.target.files[0]);
+                }
+                document.body.removeChild(tempInput);
+            });
+            
+            tempInput.click();
         });
     }
     
     // Cloud Storage button
     if (driveFileBtn) {
-        driveFileBtn.addEventListener('click', (e) => {
+        driveFileBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            // Clear accept to allow cloud pickers
-            fileInput.removeAttribute('accept');
-            // Trigger file picker
-            fileInput.click();
+            // Create a new file input dynamically
+            const tempInput = document.createElement('input');
+            tempInput.type = 'file';
+            tempInput.accept = '.csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            tempInput.style.display = 'none';
+            document.body.appendChild(tempInput);
+            
+            tempInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    handleFile(e.target.files[0]);
+                }
+                document.body.removeChild(tempInput);
+            });
+            
+            tempInput.click();
         });
     }
-    
-    // Also ensure the original file input change handler still works
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-            handleFile(e.target.files[0]);
-        }
-    });
 }
