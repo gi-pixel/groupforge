@@ -215,6 +215,33 @@
     color: var(--gray-700);
 }
 
+/* Feature Preview Items (Coming Soon page) */
+.feature-preview {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 2rem 0 1.5rem;
+    text-align: left;
+}
+
+.feature-preview-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    color: var(--gray-700);
+}
+
+.feature-preview-item svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--indigo-600);
+    flex-shrink: 0;
+}
+
 /* Responsive Documentation */
 @media (max-width: 768px) {
     .layout {
@@ -235,5 +262,15 @@
 
     .feature-grid {
         grid-template-columns: 1fr;
+    }
+
+        .feature-preview {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .feature-preview-item svg {
+        width: 18px;
+        height: 18px;
     }
 }
