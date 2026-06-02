@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>GroupForge | Intelligent Group Splitting Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/core.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="560755f9-4e1f-46f4-b4d9-fcd3adaf59e9"></script>
+</head>
+<body>
+    <div class="app">
+        <!-- Navigation Bar - Redesigned -->
+        <nav class="navbar">
+            <div class="nav-container">
+                    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <div class="logo">
+                        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="logo-text">Group<span class="logo-highlight">Forge</span></span>
+                    </div>
+                    
+                    <div class="nav-links">
+                        <a href="index.html" class="nav-link active">Workspace</a>
+                        <a href="documentation.html" class="nav-link">Documentation</a>
+                        <a href="support.html" class="nav-link">Support</a>
+                    </div>
+
+                    <button class="theme-toggle" id="themeToggle" aria-label="Dark mode">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
+                    
+                </div>
+            
+            <!-- Mobile Menu Overlay -->
+            <div class="mobile-menu" id="mobileMenu">
+                <div class="mobile-menu-header">
+                    <div class="mobile-logo">
+                        <svg class="logo-icon" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        <span>GroupForge</span>
+                    </div>
+                    <button class="close-menu" id="closeMenuBtn">&times;</button>
+                </div>
+                <div class="mobile-menu-links">
+                    <a href="index.html" class="mobile-nav-link active">Workspace</a>
+                    <a href="documentation.html" class="mobile-nav-link">Documentation</a>
+                    <a href="support.html" class="mobile-nav-link">Support</a>
+                </div>
+            </div>
+            <div class="menu-overlay" id="menuOverlay"></div>
+        </nav>
+
+        <!-- Hero Section - Compact -->
+        <div class="hero">
+            <div class="hero-content">
+                <h1>Split. Organize. <span class="gradient-text">Excel.</span></h1>
+                <p>Upload CSV or Excel, choose group sizes, generate sheets</p>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Upload Card - Compact -->
+            <div class="card upload-card" id="uploadCard">
+                <div class="card-header compact">
+                    <h3>Import Data</h3>
+                    <p>Upload your member list</p>
+                </div>
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 16V4M12 4L8 8M12 4L16 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4 16V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <p class="upload-text">Click or drag file</p>
+                    <p class="upload-hint">CSV, Excel</p>
+                    <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" hidden>
+                    <div class="file-status" id="fileStatus"></div>
+                </div>
+
+                <!-- Android Single Button (hidden by default) -->
+                <div id="androidUploadContainer" style="display: none; margin: 0 1rem 1rem 1rem;">
+                    <button id="androidUploadBtn" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--indigo-500) 0%, var(--indigo-600) 100%); border: none; border-radius: var(--radius-md); cursor: pointer; font-size: 1rem; font-weight: 600; color: white;">
+                        Select File to Upload
+                    </button>
+                    <p style="font-size: 0.7rem; color: var(--gray-500); text-align: center; margin-top: 0.75rem;">
+                        Tap to choose file from device, Google Drive, or cloud storage
+                    </p>
+                </div>
+            </div>
+
+            <!-- Data Preview Card -->
+            <div class="card data-card" id="dataCard" style="display: none;">
+                <div class="card-header compact">
+                    <h3>Data Preview</h3>
+                    <p>Select columns to keep</p>
+                </div>
+                <div class="columns-section">
+                    <div class="columns-header">
+                        <span>Available Columns</span>
+                        <button class="btn-text" id="toggleColumnsBtn">Select All</button>
+                    </div>
+                    <div class="columns-grid" id="columnsGrid"></div>
+                </div>
+                <div class="preview-container">
+                    <div class="preview-header">
+                        <span>Preview (first 10 rows)</span>
+                        <span class="record-count" id="recordCount"></span>
+                    </div>
+                    <div class="preview-table-wrapper">
+                        <div class="preview-table" id="previewTable"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Card -->
+            <div class="card config-card" id="configCard" style="display: none;">
+                <div class="card-header compact">
+                    <h3>Group Configuration</h3>
+                    <p>Choose how to split</p>
+                </div>
+
+                <!-- Mode Toggle -->
+                <div class="mode-switch">
+                    <button class="mode-option active" data-mode="single">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        Single
+                    </button>
+                    <button class="mode-option" data-mode="multiple">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M4 4H20V8L12 13L4 8V4Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                            <path d="M4 12H20V16L12 21L4 16V12Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                        </svg>
+                        Multiple
+                        
+                    </button>
+                </div>
+
+                <!-- Duplicate Detection Settings -->
+<div class="duplicate-settings" id="duplicateSettings" style="display: none;">
+    <div class="setting-label">
+        <span>Check for duplicates in:</span>
+    </div>
+    <div class="duplicate-columns-grid" id="duplicateColumnsGrid">
+        <!-- Checkboxes will be populated dynamically -->
+    </div>
+    <small class="setting-hint">Duplicates detected when ALL selected columns match (case-insensitive). Unchecked duplicates will be removed.</small>
+</div>
+
+                <!-- Single Mode -->
+                <div class="mode-content" id="singleMode">
+                    <div class="input-field">
+                        <label>Members per group</label>
+                        <input type="number" id="singleGroupSize" min="1" value="5">
+                        <small class="input-hint">→ <span id="liveGroupCount">0</span> groups</small>
+                    </div>
+                </div>
+
+                <!-- Multiple Mode -->
+                <div class="mode-content" id="multipleMode" style="display: none;">
+                    <div class="input-field">
+                        <label>Group configurations</label>
+                        <div id="groupSizesList">
+                            <div class="config-item">
+                                <div class="size-item">
+                                    <input type="number" class="size-input" value="3" placeholder="Size">
+                                    <button class="btn-icon remove-size" onclick="removeGroupSize(this)">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <input type="text" class="sheet-name-input" placeholder="Sheet name (optional)" value="Groups of 3">
+                                <small class="sheet-hint">→ <span class="group-count-number">0</span> groups</small>
+                            </div>
+                            <div class="config-item">
+                                <div class="size-item">
+                                    <input type="number" class="size-input" value="5" placeholder="Size">
+                                    <button class="btn-icon remove-size" onclick="removeGroupSize(this)">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <input type="text" class="sheet-name-input" placeholder="Sheet name (optional)" value="Groups of 5">
+                                <small class="sheet-hint">→ <span class="group-count-number">0</span> groups</small>
+                            </div>
+                            <div class="config-item">
+                                <div class="size-item">
+                                    <input type="number" class="size-input" value="10" placeholder="Size">
+                                    <button class="btn-icon remove-size" onclick="removeGroupSize(this)">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <input type="text" class="sheet-name-input" placeholder="Sheet name (optional)" value="Groups of 10">
+                                <small class="sheet-hint">→ <span class="group-count-number">0</span> groups</small>
+                            </div>
+                        </div>
+                        <button class="btn-add" id="addSizeBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            Add config
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Bar - Compact -->
+                <div class="stats-bar" id="statsBar" style="display: none;">
+                    <div class="stat-card">
+                        <span class="stat-value" id="totalMembers">0</span>
+                        <span class="stat-label">Members</span>
+                    </div>
+                    <div class="stat-card" id="singleStat">
+                        <span class="stat-value" id="totalGroups">0</span>
+                        <span class="stat-label">Groups</span>
+                    </div>
+                    <div class="stat-card" id="multipleStat" style="display: none;">
+                        <span class="stat-value" id="numConfigs">0</span>
+                        <span class="stat-label">Configs</span>
+                    </div>
+                </div>
+
+                <!-- Generate Button - Compact -->
+                <button class="btn-generate" id="generateBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M12 15V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    Generate & Download
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Duplicate Detection Modal -->
+<div class="modal-overlay" id="duplicateModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3>Duplicate Members Detected</h3>
+            <button class="modal-close" id="closeModalBtn">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- Duplicate groups will be inserted here -->
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-secondary" id="cancelModalBtn">Cancel Generation</button>
+            <button class="modal-btn modal-btn-primary" id="confirmDuplicateBtn">Remove Unchecked & Continue</button>
+        </div>
+    </div>
+</div>
+
+<!-- Shuffle Modal -->
+<div class="shuffle-modal-overlay" id="shuffleModal">
+    <div class="shuffle-modal-container">
+        <h3>Randomize Order?</h3>
+        <p>Do you want to shuffle (randomize) the member list before grouping?</p>
+        <div class="shuffle-buttons">
+            <button class="shuffle-btn shuffle-btn-yes" id="shuffleYesBtn">Yes, Shuffle</button>
+            <button class="shuffle-btn shuffle-btn-no" id="shuffleNoBtn">No, Keep Order</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/index.js"></script>
+</body>
+</html>
