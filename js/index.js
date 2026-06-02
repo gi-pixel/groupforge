@@ -177,6 +177,22 @@ function populateDuplicateColumns() {
     settingsDiv.style.display = 'block';
 }
 
+function cleanQuotes(str) {
+    if (!str) return '';
+
+    let cleaned = String(str).trim();
+    if (cleaned.startsWith('"') && cleaned.endswith('"')) {
+        cleaned = cleaned.slice(1, -1);
+    }
+
+    if (cleaned.startsWith("'") && cleaned.endswith("'")) {
+        cleaned = cleaned.slice(1, -1);
+    }
+
+    cleaned = cleaned.replace(/""/g, '"');
+    cleaned = cleaned.replace(/\\"/g, '"');
+    return cleaned;
+}
 // ========== FILE HANDLING ==========
 function handleFile(file) {
     const extension = file.name.split('.').pop().toLowerCase();
@@ -200,7 +216,8 @@ function handleFile(file) {
                     const values = line.split(',');
                     const row = {};
                     currentHeaders.forEach((header, idx) => {
-                        row[header] = values[idx] ? values[idx].trim() : '';
+                        let rawValue = values[idx] ? values[idx].trim() : '';
+                        row[header] = cleanQuotes(rawValue); 
                     });
                     return row;
                 });
