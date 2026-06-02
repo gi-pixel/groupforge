@@ -525,9 +525,9 @@
 .modal-container {
     background: var(--white);
     border-radius: var(--radius-xl);
-    max-width: 700px;
+    max-width: 600px;
     width: 90%;
-    max-height: 80vh;
+    max-height: 85vh;
     overflow: hidden;
     box-shadow: var(--shadow-xl);
 }
@@ -613,6 +613,9 @@
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
+    position: sticky;
+    bottom: 0;
+    z-index: 1001;;
 }
 
 .modal-btn {
@@ -622,6 +625,8 @@
     font-weight: 500;
     font-size: 0.8rem;
     transition: all 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .modal-btn-primary {
