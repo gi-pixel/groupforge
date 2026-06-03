@@ -596,27 +596,31 @@ document.getElementById('cancelModalBtn')?.addEventListener('click', () => {
 
 document.getElementById('confirmDuplicateBtn')?.addEventListener('click', processDuplicateSelection);
 
+
 // ========== GENERATE BUTTON ==========
 generateBtn.addEventListener('click', async () => {
-    console.log('Generate button clicked');
+    showProcessing();
+    resetProcessingSteps();
     
     if (!currentRows.length) {
+        hideProcessing();
         showAlert('No data loaded', 'error');
         return;
     }
     
     if (selectedColumns.length === 0) {
+        hideProcessing();
         showAlert('Please select at least one column', 'error');
         return;
     }
     
     const configs = getGroupConfigs();
     if (configs.length === 0) {
+        hideProcessing();
         showAlert('Please add at least one valid group configuration', 'error');
         return;
     }
     
-    // Step 1: Start with original members
     let workingMembers = currentRows.map(row => {
         const newRow = {};
         selectedColumns.forEach(col => {
@@ -625,10 +629,10 @@ generateBtn.addEventListener('click', async () => {
         return newRow;
     });
     
-    console.log('Working members count:', workingMembers.length);
-    
-    // Step 2: Check for duplicates if columns are selected
+    // Step 2: Check for duplicates
     if (duplicateColumns.length > 0) {
+        updateProcessingStep('stepDuplicate', 'active');
+        
         const duplicates = detectDuplicatesInList(workingMembers);
         
         if (duplicates.length > 0) {
@@ -638,30 +642,20 @@ generateBtn.addEventListener('click', async () => {
             if (toKeep && toKeep.length > 0) {
                 workingMembers = removeUncheckedDuplicatesFromMembers(workingMembers, toKeep, duplicates);
                 updatePreviewAfterCleaning(workingMembers);
-                
-                let removedCount = 0;
-                duplicates.forEach((dup, idx) => {
-                    const kept = toKeep.find(t => t.dupIdx === idx);
-                    if (kept) {
-                        removedCount += dup.occurrences.length - kept.checkedIndices.length;
-                    } else {
-                        removedCount += dup.occurrences.length;
-                    }
-                });
-                showAlert(`Removed ${removedCount} duplicate entr${removedCount === 1 ? 'y' : 'ies'}`, 'success');
             } else {
+                hideProcessing();
                 showAlert('Duplicate resolution cancelled. Generation aborted.', 'error');
                 return;
             }
         }
+        updateProcessingStep('stepDuplicate', 'completed');
     }
     
     // Step 3: Ask for shuffle
+    updateProcessingStep('stepShuffle', 'active');
     const shouldShuffle = await showShuffleModal();
-    console.log('Shuffle choice:', shouldShuffle);
     
     if (shouldShuffle) {
-        // Fisher-Yates shuffle algorithm
         for (let i = workingMembers.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [workingMembers[i], workingMembers[j]] = [workingMembers[j], workingMembers[i]];
@@ -669,9 +663,10 @@ generateBtn.addEventListener('click', async () => {
         showAlert('Member list shuffled', 'success');
         renderPreview();
     }
+    updateProcessingStep('stepShuffle', 'completed');
     
-    // Step 4: Create workbook and export
-    console.log('Creating workbook...');
+    // Step 4: Create groups
+    updateProcessingStep('stepGroup', 'active');
     const workbook = XLSX.utils.book_new();
     
     if (currentMode === 'single') {
@@ -687,11 +682,18 @@ generateBtn.addEventListener('click', async () => {
             XLSX.utils.book_append_sheet(workbook, worksheet, config.sheetName);
         });
     }
+    updateProcessingStep('stepGroup', 'completed');
     
+    // Step 5: Export
+    updateProcessingStep('stepExport', 'active');
     const fileName = `groupforge_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.xlsx`;
     XLSX.writeFile(workbook, fileName);
-    showAlert(` File downloaded: ${fileName}`, 'success');
-    console.log('Download complete');
+    updateProcessingStep('stepExport', 'completed');
+    
+    setTimeout(() => {
+        hideProcessing();
+        showAlert(`✅ File downloaded: ${fileName}`, 'success');
+    }, 500);
 });
 
 // ========== HELPER FUNCTIONS ==========
@@ -723,6 +725,40 @@ function updateConfigGroupCounts() {
             } else {
                 countSpan.textContent = '0';
             }
+        }
+    });
+}
+
+// ========== PROCESSING OVERLAY ==========
+function showProcessing() {
+    const overlay = document.getElementById('processingOverlay');
+    if (overlay) overlay.classList.add('active');
+}
+
+function hideProcessing() {
+    const overlay = document.getElementById('processingOverlay');
+    if (overlay) overlay.classList.remove('active');
+}
+
+function updateProcessingStep(step, status) {
+    const stepElement = document.getElementById(step);
+    if (stepElement) {
+        if (status === 'active') {
+            stepElement.classList.add('active');
+            stepElement.classList.remove('completed');
+        } else if (status === 'completed') {
+            stepElement.classList.add('completed');
+            stepElement.classList.remove('active');
+        }
+    }
+}
+
+function resetProcessingSteps() {
+    const steps = ['stepDuplicate', 'stepShuffle', 'stepGroup', 'stepExport'];
+    steps.forEach(step => {
+        const el = document.getElementById(step);
+        if (el) {
+            el.classList.remove('active', 'completed');
         }
     });
 }
