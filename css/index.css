@@ -528,37 +528,57 @@
     max-width: 600px;
     width: 90%;
     max-height: 85vh;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     box-shadow: var(--shadow-xl);
 }
 
 .modal-header {
-    padding: 1.25rem;
+    padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--gray-200);
     background: linear-gradient(135deg, var(--indigo-50) 0%, var(--white) 100%);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .modal-header h3 {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--gray-800);
+    margin: 0;
 }
 
 .modal-close {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     cursor: pointer;
     color: var(--gray-500);
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-body {
-    padding: 1.25rem;
-    max-height: 60vh;
+    padding: 1rem;
     overflow-y: auto;
+    flex: 1;
+}
+
+.modal-footer {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    background: var(--white);
 }
 
 .duplicate-group {
@@ -625,8 +645,6 @@
     font-weight: 500;
     font-size: 0.8rem;
     transition: all 0.2s;
-    -webkit-appearance: none;
-    appearance: none;
 }
 
 .modal-btn-primary {
@@ -647,6 +665,23 @@
 
 .modal-btn-secondary:hover {
     background: var(--gray-50);
+}
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--gray-400);
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--indigo-400);
 }
 
 .select-all-row {
