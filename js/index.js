@@ -598,6 +598,8 @@ document.getElementById('confirmDuplicateBtn')?.addEventListener('click', proces
 
 // ========== GENERATE BUTTON ==========
 generateBtn.addEventListener('click', async () => {
+    console.log('Generate button clicked');
+    
     if (!currentRows.length) {
         showAlert('No data loaded', 'error');
         return;
@@ -614,6 +616,7 @@ generateBtn.addEventListener('click', async () => {
         return;
     }
     
+    // Step 1: Start with original members
     let workingMembers = currentRows.map(row => {
         const newRow = {};
         selectedColumns.forEach(col => {
@@ -622,6 +625,9 @@ generateBtn.addEventListener('click', async () => {
         return newRow;
     });
     
+    console.log('Working members count:', workingMembers.length);
+    
+    // Step 2: Check for duplicates if columns are selected
     if (duplicateColumns.length > 0) {
         const duplicates = detectDuplicatesInList(workingMembers);
         
@@ -650,8 +656,12 @@ generateBtn.addEventListener('click', async () => {
         }
     }
     
+    // Step 3: Ask for shuffle
     const shouldShuffle = await showShuffleModal();
+    console.log('Shuffle choice:', shouldShuffle);
+    
     if (shouldShuffle) {
+        // Fisher-Yates shuffle algorithm
         for (let i = workingMembers.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [workingMembers[i], workingMembers[j]] = [workingMembers[j], workingMembers[i]];
@@ -660,6 +670,8 @@ generateBtn.addEventListener('click', async () => {
         renderPreview();
     }
     
+    // Step 4: Create workbook and export
+    console.log('Creating workbook...');
     const workbook = XLSX.utils.book_new();
     
     if (currentMode === 'single') {
@@ -678,7 +690,8 @@ generateBtn.addEventListener('click', async () => {
     
     const fileName = `groupforge_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.xlsx`;
     XLSX.writeFile(workbook, fileName);
-    showAlert(`✅ File downloaded: ${fileName}`, 'success');
+    showAlert(` File downloaded: ${fileName}`, 'success');
+    console.log('Download complete');
 });
 
 // ========== HELPER FUNCTIONS ==========
