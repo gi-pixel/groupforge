@@ -178,21 +178,26 @@ function populateDuplicateColumns() {
 }
 
 function cleanQuotes(str) {
+    // Handle non-string values
+    if (str === null || str === undefined) return '';
+    if (typeof str !== 'string') {
+        str = String(str);
+    }
     if (!str) return '';
-
-    let cleaned = String(str).trim();
-    if (cleaned.startsWith('"') && cleaned.endswith('"')) {
+    
+    let cleaned = str.trim();
+    
+    if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
         cleaned = cleaned.slice(1, -1);
     }
-
-    if (cleaned.startsWith("'") && cleaned.endswith("'")) {
+    if (cleaned.startsWith("'") && cleaned.endsWith("'")) {
         cleaned = cleaned.slice(1, -1);
     }
-
     cleaned = cleaned.replace(/""/g, '"');
     cleaned = cleaned.replace(/\\"/g, '"');
     return cleaned;
 }
+
 // ========== FILE HANDLING ==========
 function handleFile(file) {
     const extension = file.name.split('.').pop().toLowerCase();
@@ -208,19 +213,20 @@ function handleFile(file) {
     
     reader.onload = function(e) {
         try {
-            if (extension === 'csv') {
-                const text = e.target.result;
-                const lines = text.split('\n');
-                currentHeaders = lines[0].split(',').map(h => h.trim());
-                currentRows = lines.slice(1).filter(line => line.trim()).map(line => {
-                    const values = line.split(',');
-                    const row = {};
-                    currentHeaders.forEach((header, idx) => {
-                        let rawValue = values[idx] ? values[idx].trim() : '';
-                        row[header] = cleanQuotes(rawValue); 
-                    });
-                    return row;
+                if (extension === 'csv') {
+                    const text = e.target.result;
+                    const lines = text.split('\n');
+                    currentHeaders = lines[0].split(',').map(h => cleanQuotes(h.trim()));
+                    currentRows = lines.slice(1).filter(line => line.trim()).map(line => {
+                        const values = line.split(',');
+                        const row = {};
+                        currentHeaders.forEach((header, idx) => {
+                            let rawValue = values[idx] ? values[idx].trim() : '';
+                            row[header] = cleanQuotes(rawValue);
+                        });
+                        return row;
                 });
+
             } else {
                 const workbook = XLSX.read(e.target.result, { type: 'binary' });
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
