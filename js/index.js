@@ -433,23 +433,31 @@ function detectDuplicatesInList(members) {
     return duplicates;
 }
 
+// ========== SHOW DUPLICATE MODAL ==========
 function showDuplicateModal(duplicates) {
     return new Promise((resolve) => {
         const modal = document.getElementById('duplicateModal');
         const modalBody = document.getElementById('modalBody');
+        const processingOverlay = document.getElementById('processingOverlay');
+        
+        // Hide processing overlay if visible
+        if (processingOverlay && processingOverlay.classList.contains('active')) {
+            processingOverlay.classList.remove('active');
+        }
         
         if (!modal || !modalBody || duplicates.length === 0) {
             resolve(null);
             return;
         }
         
+        // Rest of your existing showDuplicateModal code...
         let html = '';
         
         duplicates.forEach((dup, idx) => {
             html += `
                 <div class="duplicate-group" data-dup-index="${idx}">
                     <div class="duplicate-title">
-                        ⚠️ Duplicate: ${escapeHtml(dup.displayName)}
+                         Duplicate: ${escapeHtml(dup.displayName)}
                     </div>
                     <div class="select-all-row">
                         <input type="checkbox" class="select-all-dup" data-dup="${idx}" id="selectAll_${idx}">
@@ -597,26 +605,20 @@ document.getElementById('cancelModalBtn')?.addEventListener('click', () => {
 document.getElementById('confirmDuplicateBtn')?.addEventListener('click', processDuplicateSelection);
 
 
-// ========== GENERATE BUTTON ==========
+// ========== GENERATE BUTTON WITH VISIBLE PROCESSING STEPS ==========
 generateBtn.addEventListener('click', async () => {
-    showProcessing();
-    resetProcessingSteps();
-    
     if (!currentRows.length) {
-        hideProcessing();
         showAlert('No data loaded', 'error');
         return;
     }
     
     if (selectedColumns.length === 0) {
-        hideProcessing();
         showAlert('Please select at least one column', 'error');
         return;
     }
     
     const configs = getGroupConfigs();
     if (configs.length === 0) {
-        hideProcessing();
         showAlert('Please add at least one valid group configuration', 'error');
         return;
     }
@@ -629,10 +631,8 @@ generateBtn.addEventListener('click', async () => {
         return newRow;
     });
     
-    // Step 2: Check for duplicates
+    // Step 1: Check for duplicates (no overlay)
     if (duplicateColumns.length > 0) {
-        updateProcessingStep('stepDuplicate', 'active');
-        
         const duplicates = detectDuplicatesInList(workingMembers);
         
         if (duplicates.length > 0) {
@@ -643,16 +643,13 @@ generateBtn.addEventListener('click', async () => {
                 workingMembers = removeUncheckedDuplicatesFromMembers(workingMembers, toKeep, duplicates);
                 updatePreviewAfterCleaning(workingMembers);
             } else {
-                hideProcessing();
                 showAlert('Duplicate resolution cancelled. Generation aborted.', 'error');
                 return;
             }
         }
-        updateProcessingStep('stepDuplicate', 'completed');
     }
     
-    // Step 3: Ask for shuffle
-    updateProcessingStep('stepShuffle', 'active');
+    // Step 2: Ask for shuffle (no overlay)
     const shouldShuffle = await showShuffleModal();
     
     if (shouldShuffle) {
@@ -663,10 +660,18 @@ generateBtn.addEventListener('click', async () => {
         showAlert('Member list shuffled', 'success');
         renderPreview();
     }
-    updateProcessingStep('stepShuffle', 'completed');
     
-    // Step 4: Create groups
+    // Step 3: Show processing overlay for grouping and export
+    showProcessing();
+    resetProcessingSteps();
+    
+    // Helper function to delay
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    
+    // Step 3a: Creating groups
     updateProcessingStep('stepGroup', 'active');
+    await delay(300); // Small delay so user sees the step
+    
     const workbook = XLSX.utils.book_new();
     
     if (currentMode === 'single') {
@@ -682,18 +687,24 @@ generateBtn.addEventListener('click', async () => {
             XLSX.utils.book_append_sheet(workbook, worksheet, config.sheetName);
         });
     }
-    updateProcessingStep('stepGroup', 'completed');
     
-    // Step 5: Export
+    updateProcessingStep('stepGroup', 'completed');
+    await delay(200);
+    
+    // Step 3b: Exporting file
     updateProcessingStep('stepExport', 'active');
+    await delay(300);
+    
     const fileName = `groupforge_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.xlsx`;
     XLSX.writeFile(workbook, fileName);
+    
     updateProcessingStep('stepExport', 'completed');
     
-    setTimeout(() => {
-        hideProcessing();
-        showAlert(`✅ File downloaded: ${fileName}`, 'success');
-    }, 500);
+    // Keep overlay visible for a moment so user sees completion
+    await delay(500);
+    
+    hideProcessing();
+    showAlert(`✅ File downloaded: ${fileName}`, 'success');
 });
 
 // ========== HELPER FUNCTIONS ==========
@@ -754,7 +765,7 @@ function updateProcessingStep(step, status) {
 }
 
 function resetProcessingSteps() {
-    const steps = ['stepDuplicate', 'stepShuffle', 'stepGroup', 'stepExport'];
+    const steps = [ 'stepGroup', 'stepExport', 'stepDownload'];
     steps.forEach(step => {
         const el = document.getElementById(step);
         if (el) {
